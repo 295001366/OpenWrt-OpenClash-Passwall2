@@ -21,22 +21,28 @@ jobs:
           git clone -b openwrt-25.12 https://github.com/openwrt/openwrt.git openwrt
           cd openwrt
           git pull origin openwrt-25.12
-          # === 增加部分：添加 PassWall 2 的软件源依赖 ===
-          echo "src-git passwall_packages https://github.com" >> feeds.conf.default
-          echo "src-git passwall_app https://github.com" >> feeds.conf.default
-          # ============================================
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Add OpenClash package source
+      - name: Add OpenClash & PassWall 2 package source
         run: |
           cd openwrt/package
+          # 拉取 OpenClash 源码
           rm -rf luci-app-openclash
           git clone https://github.com/vernesong/OpenClash.git luci-app-openclash
+          
+          # 拉取 PassWall 2 完整依赖源码
+          mkdir -p passwall
+          cd passwall
+          # PassWall2 核心依赖包
+          git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall-packages.git
+          # PassWall2 LuCI控制面板
+          git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall.git
 
-      - name: Load custom config & auto download latest mihomo core
+      - name: Load custom config & auto download latest mihomo core & Zashboard
         run: |
           cd openwrt
+          # 设备基础编译配置
           echo "CONFIG_TARGET_ramips=y" > .config
           echo "CONFIG_TARGET_ramips_mt7621=y" >> .config
           echo "CONFIG_TARGET_ramips_mt7621_DEVICE_hiwifi_hc5962=y" >> .config
@@ -46,11 +52,11 @@ jobs:
           echo "CONFIG_PACKAGE_ca-bundle=y" >> .config
           echo "CONFIG_PACKAGE_libopenssl=y" >> .config
           echo "CONFIG_PACKAGE_luci-app-openclash=y" >> .config
-          # === 增加部分：添加 PassWall 2 编译配置及语言包 ===
+          # PassWall2 编译配置+中文语言包
           echo "CONFIG_PACKAGE_luci-app-passwall=y" >> .config
           echo "CONFIG_PACKAGE_luci-i18n-passwall-zh-cn=y" >> .config
-          # ============================================
 
+          # 自动下载最新 Mihomo (Clash Meta) 核心
           mkdir -p package/base-files/files/etc/openclash/core/
           LATEST_MIHOMO=$(curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | jq -r .tag_name)
           wget "https://github.com/MetaCubeX/mihomo/releases/download/${LATEST_MIHOMO}/mihomo-linux-mipsle-softfloat-${LATEST_MIHOMO}.gz" \
@@ -58,13 +64,13 @@ jobs:
           gunzip package/base-files/files/etc/openclash/core/clash_meta.gz
           chmod +x package/base-files/files/etc/openclash/core/clash_meta
 
-          # === 增加部分：自动下载并集成 Zashboard 面板 v3.14.0 ===
+          # 自动集成 Zashboard 面板 v3.14.0（修复解压目录错误）
           mkdir -p package/base-files/files/etc/openclash/ui/zashboard/
-          wget "https://github.com" -O zashboard.tar.gz
+          wget "https://github.com/ZebraElaine/Zashboard/releases/download/v3.14.0/zashboard-dist.tar.gz" -O zashboard.tar.gz
           tar -zxf zashboard.tar.gz -C package/base-files/files/etc/openclash/ui/
-          mv package/base-files/files/etc/openclash/ui/dist package/base-files/files/etc/openclash/ui/zashboard/dist
+          # 修复：压缩包解压目录为 zashboard-dist，而非 dist
+          mv package/base-files/files/etc/openclash/ui/zashboard-dist package/base-files/files/etc/openclash/ui/zashboard/dist
           rm -f zashboard.tar.gz
-          # ====================================================
 
       - name: Compile the firmware
         run: |
