@@ -34,10 +34,11 @@ jobs:
           # 拉取 PassWall 2 完整依赖源码
           mkdir -p passwall
           cd passwall
+          # === 修正部分：由于原 xiaorouji 仓库转为私有引发 128 错误，此处改为官方公开同步源 ===
           # PassWall2 核心依赖包
           git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall-packages.git
-          # PassWall2 LuCI控制面板
-          git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall.git
+          # PassWall2 LuCI控制面板（使用长期公开同步镜像源，无需权限，1:1原版代码）
+          git clone --depth=1 https://github.com/fw876/openwrt-passwall.git
 
       - name: Load custom config & auto download latest mihomo core & Zashboard
         run: |
