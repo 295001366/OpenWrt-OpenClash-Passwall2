@@ -58,7 +58,7 @@ jobs:
 
           # 自动下载最新 Mihomo (Clash Meta) 核心
           mkdir -p package/base-files/files/etc/openclash/core/
-          LATEST_MIHOMO=$(curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | jq -r .tag_name)
+          LATEST_MIHOMO=$(curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | jq -r .tag_name)          
           wget "https://github.com/MetaCubeX/mihomo/releases/download/${LATEST_MIHOMO}/mihomo-linux-mipsle-softfloat-${LATEST_MIHOMO}.gz" \
           -O package/base-files/files/etc/openclash/core/clash_meta.gz         
           gunzip package/base-files/files/etc/openclash/core/clash_meta.gz
