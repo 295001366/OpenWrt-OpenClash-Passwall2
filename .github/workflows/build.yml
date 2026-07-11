@@ -1,3 +1,4 @@
+
 on:
   workflow_dispatch:
 
@@ -31,14 +32,12 @@ jobs:
           rm -rf luci-app-openclash
           git clone https://github.com/vernesong/OpenClash.git luci-app-openclash
           
-          # 拉取 PassWall 2 完整依赖源码
-          mkdir -p passwall
-          cd passwall
-          # === 修正部分：由于原 xiaorouji 仓库转为私有引发 128 错误，此处改为官方公开同步源 ===
-          # PassWall2 核心依赖包
-          git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall-packages.git
-          # PassWall2 LuCI控制面板（使用长期公开同步镜像源，无需权限，1:1原版代码）
-          git clone --depth=1 https://github.com/fw876/openwrt-passwall.git
+          # === 优化部分：为了防止 OpenWrt 25.12 深度目录扫描不到插件，直接平铺克隆到 package/ 根目录下 ===
+          # 1. PassWall2 核心依赖包
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
+          # 2. PassWall2 LuCI控制面板
+          git clone --depth=1 https://github.com/immortalwrt/luci-app-passwall.git
+          # =======================================================================================
 
       - name: Load custom config & auto download latest mihomo core & Zashboard
         run: |
