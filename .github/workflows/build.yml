@@ -35,7 +35,9 @@ jobs:
           # PassWall2 完整核心依赖库
           git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git
           # PassWall2 LuCI控制面板
-          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git
+          git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall.git  openwrt-passwall-tmp
+          mv openwrt-passwall-tmp/luci-app-passwall ./
+          rm -rf openwrt-passwall-tmp
 
       - name: Load custom config & auto download latest mihomo core & Zashboard
         run: |
