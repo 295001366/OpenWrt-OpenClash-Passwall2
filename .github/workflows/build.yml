@@ -64,12 +64,15 @@ jobs:
           gunzip package/base-files/files/etc/openclash/core/clash_meta.gz
           chmod +x package/base-files/files/etc/openclash/core/clash_meta
 
-          # 自动集成 Zashboard 面板 v3.14.0（已修复解压目录报错）
+          # 自动集成 Zashboard 面板 v3.14.0（完全适配官方 Zephyruso 纯净 zip 源）
           mkdir -p package/base-files/files/etc/openclash/ui/zashboard/
-          wget "https://github.com/ZebraElaine/Zashboard/releases/download/v3.14.0/zashboard-dist.tar.gz" -O zashboard.tar.gz
-          tar -zxf zashboard.tar.gz -C package/base-files/files/etc/openclash/ui/
-          mv package/base-files/files/etc/openclash/ui/zashboard-dist package/base-files/files/etc/openclash/ui/zashboard/dist
-          rm -f zashboard.tar.gz
+          wget "https://github.com/Zephyruso/zashboard/releases/download/v3.14.0/dist-cdn-fonts.zip" -O zashboard.zip
+          unzip -q zashboard.zip -d package/base-files/files/etc/openclash/ui/
+          # === 修正部分：由于 cdn 包解压出来目录名为 dist-cdn-fonts，此处对应修改以防报错 ===
+          mv package/base-files/files/etc/openclash/ui/dist-cdn-fonts package/base-files/files/etc/openclash/ui/zashboard/dist
+          # ====================================================================================
+          rm -f zashboard.zip
+
 
       - name: Compile the firmware
         run: |
